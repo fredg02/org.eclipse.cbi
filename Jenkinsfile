@@ -13,7 +13,7 @@ pipeline {
   agent {
     kubernetes {
       label 'cbi-agent'
-      //defaultContainer 'cbi'
+      defaultContainer 'cbi'
       yaml """    
 apiVersion: v1
 kind: Pod
