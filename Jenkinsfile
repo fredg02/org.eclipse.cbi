@@ -13,7 +13,7 @@ pipeline {
   agent {
     kubernetes {
       label 'cbi-agent'
-      defaultContainer 'cbi'
+      //defaultContainer 'cbi'
       yaml """    
 apiVersion: v1
 kind: Pod
@@ -22,7 +22,8 @@ spec:
   - name: cbi
     image: eclipsecbi/cbi-build-env
     imagePullPolicy: Always
-    args: ["cat"]
+    command:
+    - cat
     tty: true
     resources:
       limits:
