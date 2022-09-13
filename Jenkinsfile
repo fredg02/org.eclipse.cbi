@@ -105,6 +105,8 @@ spec:
     stage('Display plugin/dependency updates') {
       steps {
         sh '''
+          ls -al /opt/tools/java/adoptopenjdk/openj9-latest-lts/bin/
+          echo "JAVA_HOME: $JAVA_HOME"
           "${WORKSPACE}/mvnw" "${VERSIONS_MAVEN_PLUGIN}:display-plugin-updates" -f "${POM}"
           "${WORKSPACE}/mvnw" "${VERSIONS_MAVEN_PLUGIN}:display-dependency-updates" -f "${POM}"
         '''
