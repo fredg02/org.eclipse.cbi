@@ -14,6 +14,7 @@ pipeline {
     kubernetes {
       label 'cbi-agent'
       defaultContainer 'cbi'
+      yamlMergeStrategy merge()
       yaml """    
 apiVersion: v1
 kind: Pod
@@ -22,8 +23,7 @@ spec:
   - name: cbi
     image: eclipsecbi/cbi-build-env
     imagePullPolicy: Always
-    command:
-    - cat
+    args: ["cat"]
     tty: true
     resources:
       limits:
@@ -32,6 +32,58 @@ spec:
       requests:
         memory: 4Gi
         cpu: 1
+    volumeMounts:
+    - mountPath: "/home/jenkins/.m2/toolchains.xml"
+      name: "toolchains-xml"
+      readOnly: true
+      subPath: "toolchains.xml"
+    - mountPath: "/home/jenkins/.m2/repository"
+      name: "m2repo"
+    - mountPath: "/home/jenkins/.m2/settings-security.xml"
+      name: "settings-security-xml"
+      readOnly: true
+      subPath: "settings-security.xml"
+    - mountPath: "/home/jenkins/.m2/settings.xml"
+      name: "settings-xml"
+      readOnly: true
+      subPath: "settings.xml"
+    - mountPath: "/home/jenkins/.ssh"
+      name: "known-hosts"
+    - mountPath: "/home/jenkins/.m2/wrapper"
+      name: "m2wrapper"
+    - mountPath: "/opt/tools"
+      name: "tools"
+      readOnly: true
+  volumes:
+  - name: "settings-security-xml"
+    secret:
+      items:
+      - key: "settings-security.xml"
+        path: "settings-security.xml"
+      secretName: "m2-secret-dir"
+  - configMap:
+      items:
+      - key: "toolchains.xml"
+        path: "toolchains.xml"
+      name: "m2-dir"
+    name: "toolchains-xml"
+  - emptyDir:
+    name: "m2repo"
+  - emptyDir:
+    name: "m2wrapper"
+  - configMap:
+      name: "known-hosts"
+    name: "known-hosts"
+  - name: "settings-xml"
+    secret:
+      items:
+      - key: "settings.xml"
+        path: "settings.xml"
+      secretName: "m2-secret-dir"
+  - name: "tools"
+    persistentVolumeClaim:
+      claimName: "tools-claim-jiro-cbi"
+      readOnly: true
 """
     }
   }
